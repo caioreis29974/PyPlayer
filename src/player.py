@@ -1,29 +1,51 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from PIL import Image, ImageTk
 import pygame
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, APIC
 
 pygame.mixer.init()
 
 def abrir_arquivo():
-    arquivo = filedialog.askopenfilename(filetypes=[("Arquivos de Áudio", "*.mp3 *.wav")])
+    arquivo = filedialog.askopenfilename(filetypes=[("Arquivos de Áudio", "*.mp3")])
     if arquivo:
         pygame.mixer.music.load(arquivo)
         nome_arquivo.set(arquivo.split('/')[-1])
+        exibir_capa(arquivo)
+
+def exibir_capa(arquivo):
+    try:
+        audio = MP3(arquivo, ID3=ID3)
+        for tag in audio.tags.values():
+            if isinstance(tag, APIC):
+                capa = tag.data
+                with open("temp_capa.jpg", "wb") as img:
+                    img.write(capa)
+                imagem = Image.open("temp_capa.jpg")
+                imagem = imagem.resize((200, 200))
+                imagem_tk = ImageTk.PhotoImage(imagem)
+                capa_placeholder.config(image=imagem_tk)
+                capa_placeholder.image = imagem_tk
+                return
+        raise ValueError("Capa não encontrada")
+    except Exception:
+        capa_placeholder.config(image="", text="Capa não disponível")
 
 def tocar_audio():
     try:
-        if pygame.mixer.music.get_pos() == -1:  # Se o áudio nunca foi iniciado
+        if pygame.mixer.music.get_pos() == -1:
             pygame.mixer.music.play()
         else:
-            pygame.mixer.music.unpause()  # Retomar a música se pausada
+            pygame.mixer.music.unpause()
     except pygame.error:
         messagebox.showerror("Erro", "Nenhum arquivo foi carregado!")
 
 def alternar_pausar_continuar():
-    if pygame.mixer.music.get_pos() > 0:  # Se o áudio está pausado ou tocando
-        if pygame.mixer.music.get_busy():  # Está tocando
+    if pygame.mixer.music.get_pos() > 0:
+        if pygame.mixer.music.get_busy():
             pygame.mixer.music.pause()
-        else:  # Está pausado
+        else:
             pygame.mixer.music.unpause()
     else:
         messagebox.showerror("Erro", "Nenhuma música está tocando no momento!")
