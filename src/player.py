@@ -1,100 +1,98 @@
 import tkinter as tk
 from tkinter import filedialog
 import pygame
-import time
 
 pygame.mixer.init()
+
 
 def abrir_arquivo():
     arquivo = filedialog.askopenfilename(filetypes=[("Arquivos de Áudio", "*.mp3 *.wav")])
     if arquivo:
         pygame.mixer.music.load(arquivo)
         nome_arquivo.set(arquivo.split('/')[-1])
-        atualizar_duracao()
+
 
 def tocar_audio():
     pygame.mixer.music.play()
-    atualizar_progresso()
+
 
 def pausar_audio():
     pygame.mixer.music.pause()
 
+
 def continuar_audio():
     pygame.mixer.music.unpause()
 
+
 def parar_audio():
     pygame.mixer.music.stop()
+
 
 def ajustar_volume(val):
     volume = float(val) / 100
     pygame.mixer.music.set_volume(volume)
 
-def atualizar_progresso():
-    if pygame.mixer.music.get_busy():
-        current_pos = pygame.mixer.music.get_pos() / 1000
-        progresso.set(current_pos)
-        tempo_atual.config(text=f"{current_pos:.2f}s")
-        janela.after(1000, atualizar_progresso)
-
-def atualizar_duracao():
-    duracao = pygame.mixer.Sound(pygame.mixer.music.get_fadeout()).get_length()
-    barra_progresso.config(to=duracao)
-
-def avancar_musica(val):
-    pygame.mixer.music.set_pos(float(val))
 
 janela = tk.Tk()
 janela.title("PyPlayer")
-janela.geometry("600x400")
-janela.config(bg="#2a2a2a")
+janela.geometry("800x800")
+janela.config(bg="#121212")
 
 nome_arquivo = tk.StringVar()
-progresso = tk.DoubleVar()
+nome_arquivo.set("Nenhum arquivo carregado")
 
-font_main = ("Arial", 12, "bold")
+cor_botao = "#5C1DFF"
+cor_primaria = "#7C4DFF"
+cor_secundaria = "#BB86FC"
+cor_texto = "#FFFFFF"
+cor_neutra = "#2A2A2A"
 
-frame = tk.Frame(janela, bg="#2a2a2a")
-frame.pack(pady=10)
+header = tk.Frame(janela, bg="#121212", height=100)
+header.pack(fill="x")
 
-label_nome = tk.Label(frame, text="Arquivo de Áudio: ", font=font_main, fg="#b2b2b2", bg="#2a2a2a")
-label_nome.grid(row=0, column=0, padx=10, sticky="w")
+frame_capa = tk.Frame(janela, bg="#121212")
+frame_capa.pack(pady=30)
 
-label_nome_arquivo = tk.Label(frame, textvariable=nome_arquivo, font=font_main, fg="#b2b2b2", bg="#2a2a2a")
-label_nome_arquivo.grid(row=0, column=1, padx=10, sticky="w")
+capa_placeholder = tk.Label(frame_capa, text="Capa do Álbum", bg="#2A2A2A", fg=cor_texto, width=30, height=15)
+capa_placeholder.pack()
 
-btn_abrir = tk.Button(janela, text="Abrir", command=abrir_arquivo, width=20, bg="#6a1b9a", fg="white", font=font_main, relief="flat")
-btn_abrir.pack(pady=5)
-btn_abrir.bind("<Enter>", lambda e: btn_abrir.config(bg="#8e24aa"))
-btn_abrir.bind("<Leave>", lambda e: btn_abrir.config(bg="#6a1b9a"))
+frame_nome = tk.Frame(janela, bg="#121212")
+frame_nome.pack(pady=10)
 
-btn_tocar = tk.Button(janela, text="Tocar", command=tocar_audio, width=20, bg="#8e24aa", fg="white", font=font_main, relief="flat")
-btn_tocar.pack(pady=5)
-btn_tocar.bind("<Enter>", lambda e: btn_tocar.config(bg="#ab47bc"))
-btn_tocar.bind("<Leave>", lambda e: btn_tocar.config(bg="#8e24aa"))
+nome_musica = tk.Label(frame_nome, textvariable=nome_arquivo, bg="#121212", fg=cor_secundaria, font=("Arial", 14, "bold"))
+nome_musica.pack()
 
-btn_pausar = tk.Button(janela, text="Pausar", command=pausar_audio, width=20, bg="#ab47bc", fg="white", font=font_main, relief="flat")
-btn_pausar.pack(pady=5)
-btn_pausar.bind("<Enter>", lambda e: btn_pausar.config(bg="#ba68c8"))
-btn_pausar.bind("<Leave>", lambda e: btn_pausar.config(bg="#ab47bc"))
+frame_controles = tk.Frame(janela, bg="#121212")
+frame_controles.pack(pady=20)
 
-btn_continuar = tk.Button(janela, text="Continuar", command=continuar_audio, width=20, bg="#ba68c8", fg="white", font=font_main, relief="flat")
-btn_continuar.pack(pady=5)
-btn_continuar.bind("<Enter>", lambda e: btn_continuar.config(bg="#ce7cb9"))
-btn_continuar.bind("<Leave>", lambda e: btn_continuar.config(bg="#ba68c8"))
+btn_voltar = tk.Button(frame_controles, text="⏮", command=lambda: None, bg=cor_botao, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
+btn_voltar.grid(row=0, column=0, padx=5)
 
-btn_parar = tk.Button(janela, text="Parar", command=parar_audio, width=20, bg="#ce7cb9", fg="white", font=font_main, relief="flat")
-btn_parar.pack(pady=5)
-btn_parar.bind("<Enter>", lambda e: btn_parar.config(bg="#e57373"))
-btn_parar.bind("<Leave>", lambda e: btn_parar.config(bg="#ce7cb9"))
+btn_tocar = tk.Button(frame_controles, text="tocar", command=tocar_audio, bg=cor_primaria, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
+btn_tocar.grid(row=0, column=1, padx=5)
 
-volume_slider = tk.Scale(janela, from_=0, to=100, orient="horizontal", label="Volume", command=ajustar_volume, bg="#2a2a2a", fg="white", sliderlength=20, length=300)
+btn_pausar = tk.Button(frame_controles, text="⏸", command=pausar_audio, bg=cor_secundaria, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
+btn_pausar.grid(row=0, column=2, padx=5)
+
+btn_parar = tk.Button(frame_controles, text="parar", command=parar_audio, bg=cor_primaria, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
+btn_parar.grid(row=0, column=3, padx=5)
+
+btn_avancar = tk.Button(frame_controles, text="⏯", command=lambda: None, bg=cor_botao, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
+btn_avancar.grid(row=0, column=4, padx=5)
+
+frame_volume = tk.Frame(janela, bg="#121212")
+frame_volume.pack(pady=20)
+
+volume_slider = tk.Scale(frame_volume, from_=0, to=100, orient="horizontal", label="Volume", command=ajustar_volume,bg="#121212", fg=cor_texto, highlightbackground="#121212", troughcolor="#2A2A2A",
+sliderlength=20, length=300)
 volume_slider.set(100)
-volume_slider.pack(pady=10)
+volume_slider.pack()
 
-barra_progresso = tk.Scale(janela, from_=0, to=100, orient="horizontal", variable=progresso, command=avancar_musica, bg="#2a2a2a", fg="white", sliderlength=20, length=300)
-barra_progresso.pack(pady=10)
+frame_abertura = tk.Frame(janela, bg="#121212")
+frame_abertura.pack(pady=20)
 
-tempo_atual = tk.Label(janela, text="0.00s", font=("Arial", 10), fg="white", bg="#2a2a2a")
-tempo_atual.pack()
+btn_abrir = tk.Button(frame_abertura, text="Abrir Música", command=abrir_arquivo, bg=cor_primaria, fg=cor_texto,
+font=("Arial", 12), width=20, relief="flat")
+btn_abrir.pack()
 
 janela.mainloop()
