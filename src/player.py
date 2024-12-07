@@ -1,9 +1,8 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import pygame
 
 pygame.mixer.init()
-
 
 def abrir_arquivo():
     arquivo = filedialog.askopenfilename(filetypes=[("Arquivos de Áudio", "*.mp3 *.wav")])
@@ -11,27 +10,30 @@ def abrir_arquivo():
         pygame.mixer.music.load(arquivo)
         nome_arquivo.set(arquivo.split('/')[-1])
 
-
 def tocar_audio():
-    pygame.mixer.music.play()
+    try:
+        if pygame.mixer.music.get_pos() == -1:  # Se o áudio nunca foi iniciado
+            pygame.mixer.music.play()
+        else:
+            pygame.mixer.music.unpause()  # Retomar a música se pausada
+    except pygame.error:
+        messagebox.showerror("Erro", "Nenhum arquivo foi carregado!")
 
-
-def pausar_audio():
-    pygame.mixer.music.pause()
-
-
-def continuar_audio():
-    pygame.mixer.music.unpause()
-
+def alternar_pausar_continuar():
+    if pygame.mixer.music.get_pos() > 0:  # Se o áudio está pausado ou tocando
+        if pygame.mixer.music.get_busy():  # Está tocando
+            pygame.mixer.music.pause()
+        else:  # Está pausado
+            pygame.mixer.music.unpause()
+    else:
+        messagebox.showerror("Erro", "Nenhuma música está tocando no momento!")
 
 def parar_audio():
     pygame.mixer.music.stop()
 
-
 def ajustar_volume(val):
     volume = float(val) / 100
     pygame.mixer.music.set_volume(volume)
-
 
 janela = tk.Tk()
 janela.title("PyPlayer")
@@ -71,7 +73,7 @@ btn_voltar.grid(row=0, column=0, padx=5)
 btn_tocar = tk.Button(frame_controles, text="tocar", command=tocar_audio, bg=cor_primaria, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
 btn_tocar.grid(row=0, column=1, padx=5)
 
-btn_pausar = tk.Button(frame_controles, text="⏸", command=pausar_audio, bg=cor_secundaria, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
+btn_pausar = tk.Button(frame_controles, text="⏸", command=alternar_pausar_continuar, bg=cor_secundaria, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
 btn_pausar.grid(row=0, column=2, padx=5)
 
 btn_parar = tk.Button(frame_controles, text="parar", command=parar_audio, bg=cor_primaria, fg=cor_texto, font=("Arial", 12), width=5, relief="flat")
@@ -83,16 +85,14 @@ btn_avancar.grid(row=0, column=4, padx=5)
 frame_volume = tk.Frame(janela, bg="#121212")
 frame_volume.pack(pady=20)
 
-volume_slider = tk.Scale(frame_volume, from_=0, to=100, orient="horizontal", label="Volume", command=ajustar_volume,bg="#121212", fg=cor_texto, highlightbackground="#121212", troughcolor="#2A2A2A",
-sliderlength=20, length=300)
+volume_slider = tk.Scale(frame_volume, from_=0, to=100, orient="horizontal", label="Volume", command=ajustar_volume, bg="#121212", fg=cor_texto, highlightbackground="#121212", troughcolor="#2A2A2A", sliderlength=20, length=300)
 volume_slider.set(100)
 volume_slider.pack()
 
 frame_abertura = tk.Frame(janela, bg="#121212")
 frame_abertura.pack(pady=20)
 
-btn_abrir = tk.Button(frame_abertura, text="Abrir Música", command=abrir_arquivo, bg=cor_primaria, fg=cor_texto,
-font=("Arial", 12), width=20, relief="flat")
+btn_abrir = tk.Button(frame_abertura, text="Abrir Música", command=abrir_arquivo, bg=cor_primaria, fg=cor_texto, font=("Arial", 12), width=20, relief="flat")
 btn_abrir.pack()
 
 janela.mainloop()
