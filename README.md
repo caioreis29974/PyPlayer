@@ -37,13 +37,13 @@ pip install pygame mutagen pillow
 1. Clone o repositório para seu computador:
 
 ```bash
-git clone https://github.com/caioreis29974/pyplayer.git
+git clone https://github.com/caioreis29974/PyPlayer.git
 ```
 
 2. Navegue até a pasta do projeto e execute o script `main.py`:
 
 ```bash
-python main.py
+python player.py
 ```
 
 A interface gráfica será aberta e você poderá carregar suas músicas e controlá-las diretamente.
