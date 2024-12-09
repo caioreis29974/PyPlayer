@@ -40,7 +40,7 @@ pip install pygame mutagen pillow
 git clone https://github.com/caioreis29974/PyPlayer.git
 ```
 
-2. Navegue até a pasta do projeto e execute o script `main.py`:
+2. Navegue até a pasta do projeto e execute o script `player.py`:
 
 ```bash
 python player.py
